@@ -7,7 +7,7 @@ from email.mime.multipart import MIMEMultipart
 from email.header import Header
 from email.utils import formataddr, formatdate, make_msgid
 
-# Автоматически загружаем .env
+
 try:
     from dotenv import load_dotenv
     BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -56,15 +56,15 @@ async def send_welcome_verification_email(to_email: str, first_name: str, code: 
             msg = MIMEMultipart("alternative")
             msg.set_charset("utf-8")
 
-            # Валидные кодированные заголовки для Mail.ru
+          
             msg["Subject"] = Header(subject_str, "utf-8").encode()
             
-            # Кодируем имя отправителя без конфликтов
+            
             sender_title = Header("Школа.MAX", "utf-8").encode()
             msg["From"] = formataddr((sender_title, smtp_user))
             msg["To"] = to_email
             
-            # Обязательные технические заголовки против бана 550 Mail.ru
+            
             msg["Date"] = formatdate(localtime=True)
             msg["Message-ID"] = make_msgid(domain=smtp_user.split("@")[-1] if "@" in smtp_user else "mail.ru")
 

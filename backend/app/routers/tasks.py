@@ -10,7 +10,7 @@ from app.models.user import User
 
 router = APIRouter(prefix="/api/tasks", tags=["Tasks"])
 
-# Автоматически добавляем колонку target_grade в SQLite при запуске, если её нет
+
 async def ensure_target_grade_column():
     async with engine.begin() as conn:
         try:
@@ -30,7 +30,7 @@ class TaskCreateRequest(BaseModel):
 async def on_startup():
     await ensure_target_grade_column()
 
-# Публикация задачи (доступна учителю и администратору)
+
 @router.post("")
 @router.post("/")
 async def create_task(data: TaskCreateRequest, db: AsyncSession = Depends(get_db)):
@@ -70,7 +70,7 @@ async def create_task(data: TaskCreateRequest, db: AsyncSession = Depends(get_db
         }
     }
 
-# Получение задач с фильтрацией по классу ученика
+
 @router.get("")
 @router.get("/")
 async def get_tasks(grade: Optional[str] = None, db: AsyncSession = Depends(get_db)):

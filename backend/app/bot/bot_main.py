@@ -5,18 +5,18 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.session.aiohttp import AiohttpSession
 from handlers import router
 
-# 🔑 Ваш токен от @BotFather
+
 BOT_TOKEN = "8833075656:AAFFPIP9o7XPeOt0pxxTVSDSzVLyDACWBTY"
 
 async def main():
     token = BOT_TOKEN.strip()
     
-    # Проверка, что токен заменен (без вашего токена внутри условия!)
+    
     if token.startswith("ВАШ_"):
         print("\n[⚠️ ОШИБКА] Укажите ваш токен от @BotFather в файле bot_main.py!\n")
         return
 
-    # Настройка прокси (при необходимости)
+    
     session = None
     session = AiohttpSession(proxy="http://185.199.229.156:7492")
 

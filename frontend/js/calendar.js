@@ -40,7 +40,7 @@ async function loadTasks() {
 async function toggleTaskStatus(taskId) {
     try {
         await API.toggleTask(taskId);
-        loadTasks(); // Перерисовываем список
+        loadTasks(); 
     } catch (err) {
         alert("Ошибка изменения статуса задачи");
     }

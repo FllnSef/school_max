@@ -14,7 +14,7 @@ from app.routers import auth, schedule, tasks, menu, ai
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Автоматическое создание всех таблиц в SQLite при старте
+    
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     yield
@@ -26,7 +26,7 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Разрешаем CORS для запросов из браузера
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -35,21 +35,21 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Подключение всех роутеров API
+
 app.include_router(auth.router)
 app.include_router(schedule.router)
 app.include_router(tasks.router)
 app.include_router(menu.router)
 app.include_router(ai.router)
 
-# Автоматический поиск и отдача index.html при открытии http://127.0.0.1:8000
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_frontend():
-    # Проверяем возможные пути к index.html
+   
     possible_paths = [
-        os.path.join("..", "index.html"),          # Если запуск из backend/
-        os.path.join("index.html"),                # В текущей папке
-        os.path.join("frontend", "index.html"),    # В папке frontend/
+        os.path.join("..", "index.html"),          
+        os.path.join("index.html"),                
+        os.path.join("frontend", "index.html"),    
         os.path.join("app", "static", "index.html")
     ]
     

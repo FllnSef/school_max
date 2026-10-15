@@ -9,7 +9,7 @@ from app.schemas.menu import MenuCreate, MenuResponse, BookingCreate, BookingRes
 
 router = APIRouter(prefix="/api/menu", tags=["Canteen & Nutrition"])
 
-# 1. Получить меню на конкретную дату (по умолчанию на сегодня)
+
 @router.get("/day/{request_date}", response_model=List[MenuResponse])
 async def get_menu_by_date(request_date: date, db: AsyncSession = Depends(get_db)):
     result = await db.execute(
@@ -17,10 +17,10 @@ async def get_menu_by_date(request_date: date, db: AsyncSession = Depends(get_db
     )
     return result.scalars().all()
 
-# 2. Записаться на питание
+
 @router.post("/book", response_model=BookingResponse)
 async def book_meal(booking_data: BookingCreate, db: AsyncSession = Depends(get_db)):
-    # Проверяем, нет ли уже такой записи у этого пользователя на эту дату
+    
     existing = await db.execute(
         select(MealBooking).filter(
             MealBooking.user_id == booking_data.user_id,
@@ -37,7 +37,7 @@ async def book_meal(booking_data: BookingCreate, db: AsyncSession = Depends(get_
     await db.refresh(new_booking)
     return new_booking
 
-# 3. Добавить блюдо в меню (для Админа/Повара)
+
 @router.post("/add-dish", response_model=MenuResponse)
 async def create_menu_item(item: MenuCreate, db: AsyncSession = Depends(get_db)):
     new_dish = CanteenMenu(**item.model_dump())

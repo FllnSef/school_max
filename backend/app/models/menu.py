@@ -4,7 +4,7 @@ from sqlalchemy import String, Date, ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
-# Тип приема пищи
+
 class MealType(str, enum.Enum):
     BREAKFAST = "завтрак"
     LUNCH = "обед"
@@ -30,7 +30,7 @@ class MealBooking(Base):
     booking_date: Mapped[date] = mapped_column(Date)           # На какую дату запись
     meal_type: Mapped[MealType] = mapped_column(String(20))     # Что именно заказано
     
-    # Связь с пользователем
+   
     user = relationship("User")
 
     def __repr__(self) -> str:

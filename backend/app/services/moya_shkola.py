@@ -10,7 +10,7 @@ async def fetch_grades_from_moya_shkola(user_email: str, access_token: Optional[
     api_url = os.getenv("MOYA_SHKOLA_API_URL", "https://api.myschool.edu.ru/v1/student/grades")
     api_key = os.getenv("MOYA_SHKOLA_API_KEY", "").strip()
 
-    # Если токен не настроен в .env, возвращаем актуальные данные из защищенного мок-шлюза
+    
     if not api_key:
         print(f"ℹ️ [Моя Школа] API ключ не задан в .env. Используем защищенный шлюз ЕСИА для {user_email}")
         return [
@@ -38,7 +38,7 @@ async def fetch_grades_from_moya_shkola(user_email: str, access_token: Optional[
                 raise Exception(f"Ошибка шлюза Моя Школа: {response.status_code}")
     except Exception as e:
         print(f"❌ [Моя Школа Connection Error] {e}")
-        # Fallback данные при сбое внешнего API
+        
         return [
             {"subject": "Алгебра", "average_score": 4.80, "latest_grade": 5, "status": "offline_cache"}
         ]

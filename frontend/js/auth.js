@@ -1,8 +1,8 @@
-// frontend/js/auth.js
+
 let currentAuthMode = 'login';
 let pendingEmail = '';
 
-// Вспомогательная функция для переключения видимости
+
 function toggleElement(id, show) {
     const el = document.getElementById(id);
     if (el) {
@@ -14,7 +14,7 @@ function toggleElement(id, show) {
 function switchAuthMode(mode) {
     currentAuthMode = mode;
     
-    // Сбрасываем окна к начальному виду
+   
     toggleElement('authMainForm', true);
     toggleElement('verifyCodeGroup', false);
 
@@ -71,7 +71,7 @@ async function handleAuthSubmit(e) {
             const data = await res.json();
             if (!res.ok) throw new Error(data.detail || 'Ошибка регистрации');
 
-            // УСПЕХ: Переключаем на ввод кода
+            
             pendingEmail = email;
             toggleElement('authMainForm', false);
             toggleElement('verifyCodeGroup', true);
@@ -80,7 +80,7 @@ async function handleAuthSubmit(e) {
             if (notice) notice.textContent = `Код отправлен на ${email}. Проверьте почту или консоль сервера.`;
 
         } else {
-            // ЛОГИКА ВХОДА
+            
             const res = await fetch('/api/auth/login', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

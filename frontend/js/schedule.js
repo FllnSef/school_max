@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Навешиваем клики на кнопки дней недели (ПН-ПТ)
     const dayBtns = document.querySelectorAll('.day-btn');
     dayBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
@@ -11,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // По умолчанию загружаем Понедельник (1)
+    
     loadSchedule(1);
 });
 

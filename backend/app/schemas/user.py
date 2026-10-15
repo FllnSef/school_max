@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 
 class SferumAuthRequest(BaseModel):
-    init_data: Optional[str] = None  # Строка window.Telegram.WebApp.initData / MAX
+    init_data: Optional[str] = None  
 
 class UserResponse(BaseModel):
     id: int

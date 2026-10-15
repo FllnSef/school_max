@@ -5,7 +5,7 @@ from typing import Dict, Any
 
 class HomeworkAIService:
     def __init__(self):
-        # В реальном проекте здесь ключи YandexGPT или GigaChat
+        
         self.api_key = os.getenv("AI_API_KEY", "demo_key")
         self.ai_url = "https://api.proxy.ai/v1/chat/completions" # Пример шлюза
 
@@ -28,7 +28,7 @@ class HomeworkAIService:
         }}
         """
 
-        # Если ключа нет, возвращаем имитацию работы мощного ИИ (для демо на хакатоне)
+        
         if self.api_key == "demo_key":
             return self._get_mock_response(raw_text)
 

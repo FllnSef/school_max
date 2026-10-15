@@ -2,11 +2,11 @@ import os
 import httpx
 from typing import Dict, Any, List
 
-# Реальный адрес тестового контура ЕСИА Минцифры
+
 ESIA_AUTH_URL = os.getenv("ESIA_AUTH_URL", "https://esia.gosuslugi.ru/aas/oauth2/ac")
 MY_SCHOOL_API_URL = os.getenv("MY_SCHOOL_API_URL", "https://api.myschool.edu.ru/v1")
 
-# Демо-база учеников, привязанных к реальным ЕСИА-профилям
+
 MOCK_ESIA_STUDENTS_DATABASE = {
     "10001234567": {  # СНИЛС ученика 1
         "fio": "Савинов Григорий",

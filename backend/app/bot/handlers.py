@@ -5,7 +5,7 @@ from keyboards import get_start_keyboard, get_main_reply_keyboard
 
 router = Router()
 
-# Вставьте адрес вашего сайта (например, локальный через ngrok или реальный домен)
+
 WEBAPP_URL = " https://fbngz-176-110-191-208.free.pinggy.net"
 
 @router.message(CommandStart())
@@ -22,7 +22,7 @@ async def cmd_start(message: Message):
         parse_mode="Markdown"
     )
     
-    # Также отправляем нижнюю кнопку для удобства
+   
     await message.answer("Или используйте кнопку в меню ниже ⬇️", reply_markup=reply_kb)
 
 @router.message(F.text == "ℹ️ Помощь")

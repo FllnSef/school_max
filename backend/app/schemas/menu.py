@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel
 from app.models.menu import MealType
 
-# Схемы для МЕНЮ
+
 class MenuBase(BaseModel):
     menu_date: date
     meal_type: MealType
@@ -17,7 +17,7 @@ class MenuResponse(MenuBase):
     class Config:
         from_attributes = True
 
-# Схемы для ЗАПИСИ (Booking)
+
 class BookingCreate(BaseModel):
     user_id: int
     booking_date: date

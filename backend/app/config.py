@@ -12,7 +12,7 @@ class Settings(BaseSettings):
    
     DATABASE_URL: str = "sqlite+aiosqlite:///./data/shkola_max.db"
     
-    # Флаг режима разработки
+    
     DEBUG: bool = True
     
     

@@ -8,11 +8,11 @@ class TaskBase(BaseModel):
     subject: str
     deadline: datetime
 
-# Схема для создания задачи (учитель передает эти данные)
-class TaskCreate(TaskBase):
-    creator_id: int  # ID учителя, создающего задачу
 
-# Схема ответа (то, что бэкенд возвращает на фронтенд)
+class TaskCreate(TaskBase):
+    creator_id: int 
+
+
 class TaskResponse(TaskBase):
     id: int
     created_at: datetime

@@ -8,7 +8,7 @@ engine = create_async_engine(
     echo=settings.DEBUG,
 )
 
-# Создаем фабрику асинхронных сессий
+
 async_session = async_sessionmaker(
     bind=engine,
     class_=AsyncSession,
