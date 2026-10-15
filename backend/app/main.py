@@ -9,7 +9,7 @@ from app.database import engine, Base
 import app.models.task
 import app.models.user
 
-# Импорт роутеров
+
 from app.routers import auth, schedule, tasks, menu, ai
 
 @asynccontextmanager
