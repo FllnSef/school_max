@@ -1,0 +1,2179 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Школа.MAX — Сервисы Сферум в MAX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #030409;
+  --bar: rgba(4, 6, 14, 0.65);
+  --panel-bg: rgba(10, 14, 26, 0.35);
+  --panel-border: rgba(255, 255, 255, 0.08);
+
+  --text-primary: #ffffff;
+  --text-body: #cbd5e1;
+  --text-muted: #94a3b8;
+
+  --max-gradient: linear-gradient(90deg, #18b5ea 0%, #3f78ff 50%, #7645ff 100%);
+  --max-gradient-h: linear-gradient(100deg, #38c8f4 0%, #608dff 55%, #a855f7 100%);
+  --max-cyan: #18b5ea;
+  --max-blue: #3f78ff;
+  --max-purple: #7645ff;
+
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+
+  --font-main: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-ui: "Plus Jakarta Sans", "Manrope", sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background-color: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+#spaceCanvas, .cosmic-vignette, #approachPlanetBg, #spaceDiveOverlay {
+  pointer-events: none !important;
+}
+
+#spaceCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  z-index: 0;
+}
+
+.cosmic-vignette {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 3, 7, 0.8) 100%);
+  z-index: 1;
+}
+
+#approachPlanetBg {
+  position: fixed;
+  width: 140px; height: 140px;
+  border-radius: 50%;
+  z-index: 1;
+  opacity: 0;
+  box-shadow: inset -25px -25px 40px rgba(0,0,0,0.9), inset 10px 10px 25px rgba(255,255,255,0.2);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.7s ease;
+  will-change: transform, opacity;
+  transform: translate(-50%, -50%) scale(0.1);
+}
+#approachPlanetBg.approaching {
+  opacity: 0.35;
+  transform: translate(-50%, -50%) scale(9);
+}
+
+#spaceDiveOverlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(6, 8, 16, 0.85) 0%, rgba(2, 3, 7, 0.98) 100%);
+  opacity: 0;
+  visibility: hidden;
+  z-index: 2;
+  transition: opacity 0.4s ease, visibility 0.4s;
+}
+#spaceDiveOverlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.topbar {
+  position: fixed; z-index: 100;
+  top: 0; left: 0; right: 0; height: 72px;
+  background: var(--bar);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 36px;
+}
+.brand { display: flex; align-items: center; gap: 12px; cursor: pointer; user-select: none; }
+.logo-max {
+  width: 38px; height: 38px; border-radius: 10px;
+  background: var(--max-gradient);
+  display: grid; place-items: center;
+}
+.logo-max svg { width: 20px; height: 20px; fill: #fff; }
+.brand-name {
+  font-family: var(--font-main);
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.brand-name span {
+  background: var(--max-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.brand-sub {
+  font-size: 10px;
+  color: #94a3b8;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.topbar-nav {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  display: flex; align-items: center; gap: 6px;
+}
+.nav-link-btn {
+  background: transparent; border: 1px solid transparent; color: #94a3b8;
+  font-family: var(--font-ui);
+  font-size: 14px; font-weight: 600; padding: 8px 16px; border-radius: 10px; cursor: pointer; transition: 0.2s;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-link-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.nav-link-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.06); }
+.nav-link-btn.active {
+  color: #fff;
+  background: rgba(63, 120, 255, 0.18);
+  border-color: rgba(63, 120, 255, 0.35);
+}
+.nav-link-btn.locked {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.topbar-right-badge {
+  font-size: 13px; color: #cbd5e1; font-weight: 600; font-family: var(--font-ui);
+  background: rgba(255, 255, 255, 0.04); padding: 7px 14px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-right-badge svg { width: 14px; height: 14px; fill: #18b5ea; }
+
+.wrap { padding-top: 72px; position: relative; z-index: 10; }
+.content { max-width: 1280px; margin: auto; padding: 0 32px 80px; position: relative; }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.home-section {
+  padding: 72px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+.home-section:last-of-type { border-bottom: none; }
+
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+.animate-on-scroll.in-view {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@keyframes weightlessFloating {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+.hero-preview-float { animation: weightlessFloating 6s ease-in-out infinite; }
+.phone-glow-wrapper-float { animation: weightlessFloating 7s ease-in-out 1s infinite; }
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+  padding-top: 24px;
+}
+
+.kicker {
+  font-size: 12px; font-weight: 700; color: #18b5ea;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  font-family: var(--font-ui); margin-bottom: 12px;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+
+.hero-layout h1 {
+  font-size: clamp(34px, 4vw, 56px);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: #ffffff;
+  margin-bottom: 18px;
+}
+.hero-layout h1 .gradient-word {
+  background: var(--max-gradient-h);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: block;
+}
+.hero-layout p {
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--text-body);
+  max-width: 580px;
+}
+.actions { display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap; }
+
+.btn-max {
+  border: 0; border-radius: 12px; padding: 14px 26px; color: #fff;
+  font-family: var(--font-main);
+  font-weight: 600; font-size: 14.5px;
+  background: var(--max-gradient);
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-max svg { width: 16px; height: 16px; fill: currentColor; }
+.btn-max:hover { opacity: 0.92; transform: translateY(-1px); }
+.btn-max.secondary {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e2e8f0;
+}
+.btn-max.secondary:hover { background: rgba(255, 255, 255, 0.09); }
+
+.preview {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
+  background: rgba(10, 13, 24, 0.7);
+  backdrop-filter: blur(16px);
+  padding: 10px;
+}
+.window-dots { height: 16px; display: flex; gap: 6px; align-items: center; padding: 0 4px 6px; }
+.window-dots span { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.window-dots span:nth-child(1) { background: #ef4444; }
+.window-dots span:nth-child(2) { background: #f59e0b; }
+.window-dots span:nth-child(3) { background: #10b981; }
+
+.phone {
+  background-color: #070912;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.chat-head {
+  padding: 10px 14px; background: rgba(12, 15, 26, 0.95);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex; gap: 10px; align-items: center;
+}
+.bot-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--max-gradient);
+  display: grid; place-items: center;
+}
+.bot-avatar svg { width: 16px; height: 16px; fill: #fff; }
+
+.bot-name { font-size: 13.5px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 6px; }
+.bot-verified { width: 13px; height: 13px; background: #18b5ea; border-radius: 50%; display: inline-grid; place-items: center; font-size: 9px; color: #000; font-weight: 800; }
+.bot-status { font-size: 11px; color: #94a3b8; font-weight: 500; }
+
+.chat-messages {
+  padding: 14px; height: 280px;
+  display: flex; flex-direction: column; gap: 12px;
+  overflow-y: auto; scroll-behavior: smooth;
+}
+.bubble {
+  position: relative;
+  max-width: 86%; padding: 10px 14px 20px;
+  border-radius: 14px; font-size: 13.5px; line-height: 1.45; font-weight: 500;
+  word-wrap: break-word;
+}
+.bubble.bot {
+  background: #192033;
+  color: #f1f5f9;
+  border-bottom-left-radius: 3px;
+}
+.bubble.user {
+  margin-left: auto;
+  background: var(--max-gradient);
+  color: #ffffff;
+  border-bottom-right-radius: 3px;
+}
+.msg-time {
+  position: absolute; right: 10px; bottom: 4px;
+  font-size: 10.5px; font-weight: 500; color: rgba(255, 255, 255, 0.65);
+  display: flex; align-items: center; gap: 3px;
+  font-family: var(--font-ui);
+}
+.msg-ticks { font-size: 10px; color: #18b5ea; font-weight: 700; }
+
+.chat-input-bar {
+  padding: 8px 10px; background: rgba(12, 15, 26, 0.95);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  display: flex; gap: 8px; align-items: center;
+}
+.chat-input-field {
+  flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px; padding: 8px 12px; color: #fff; font-size: 13px; outline: none; font-family: var(--font-main);
+}
+.chat-input-field:focus { border-color: var(--max-blue); }
+.chat-send-btn {
+  width: 32px; height: 32px; border-radius: 8px; border: none;
+  background: var(--max-gradient); color: #fff;
+  display: grid; place-items: center; cursor: pointer;
+}
+.chat-send-btn svg { width: 14px; height: 14px; fill: #fff; }
+
+.section-header-center { text-align: center; max-width: 720px; margin: 0 auto 40px; }
+.section-header-center h2 {
+  font-size: clamp(26px, 3vw, 36px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-top: 6px;
+}
+.section-header-center p {
+  color: var(--text-body);
+  font-size: 15.5px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
+.planets-orbit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.planet-card {
+  position: relative;
+  background: rgba(10, 14, 26, 0.4);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 18px; padding: 26px 18px 20px;
+  text-align: center; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center;
+  transition: transform 0.25s, border-color 0.25s;
+}
+.planet-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(63, 120, 255, 0.35);
+}
+
+.planet-sphere-wrap {
+  width: 90px; height: 90px; margin-bottom: 14px;
+  position: relative; display: grid; place-items: center;
+}
+.planet-sphere {
+  width: 66px; height: 66px; border-radius: 50%; position: relative;
+  box-shadow: inset -12px -12px 20px rgba(0, 0, 0, 0.9),
+              inset 4px 4px 10px rgba(255, 255, 255, 0.25);
+}
+
+.planet-ring {
+  position: absolute; width: 100px; height: 28px; border-radius: 50%;
+  border: 3px solid rgba(118, 69, 255, 0.4); border-top-color: transparent;
+  transform: rotate(-25deg); pointer-events: none;
+}
+
+.p-knowledge .planet-sphere { background: radial-gradient(circle at 30% 30%, #e9d5ff, #8b5cf6 50%, #2e064e 90%); }
+.p-time .planet-sphere { background: radial-gradient(circle at 30% 30%, #fef3c7, #f59e0b 50%, #682d09 90%); }
+.p-energy .planet-sphere { background: radial-gradient(circle at 30% 30%, #d1fae5, #10b981 50%, #04382a 90%); }
+.p-station .planet-sphere { background: radial-gradient(circle at 30% 30%, #cffafe, #18b5ea 50%, #062836 90%); }
+
+.planet-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+.planet-sub { font-size: 11px; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; font-family: var(--font-ui); }
+.planet-desc { font-size: 13px; color: var(--text-body); line-height: 1.45; margin-bottom: 18px; flex-grow: 1; }
+.planet-jump-btn {
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff; padding: 8px 14px; border-radius: 10px; font-weight: 600; font-size: 12.5px;
+  width: 100%; transition: 0.2s; font-family: var(--font-ui);
+}
+.planet-card:hover .planet-jump-btn {
+  background: var(--max-gradient); border-color: transparent;
+}
+
+.problems-section-grid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 48px;
+  align-items: center;
+}
+
+.phone-glow-wrapper {
+  position: relative; display: flex; justify-content: center; align-items: center;
+}
+.iphone-mockup {
+  position: relative; width: 260px; height: 470px; background: #0b0e18;
+  border-radius: 36px; border: 2px solid rgba(255, 255, 255, 0.12); box-shadow: 0 20px 45px rgba(0,0,0,0.7);
+  overflow: hidden; padding: 10px;
+}
+.dynamic-island { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); width: 70px; height: 18px; background: #000; border-radius: 10px; z-index: 10; }
+.phone-content { padding: 30px 12px 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; }
+.problem-slide { display: flex; flex-direction: column; gap: 8px; transition: opacity 0.25s; }
+.prob-num { font-size: 10px; color: #18b5ea; font-weight: 700; text-transform: uppercase; font-family: var(--font-ui); }
+.pixel-3d-container {
+  width: 100%; height: 95px; background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; display: flex; align-items: center; justify-content: center;
+}
+.prob-title { font-size: 15px; font-weight: 700; color: #fff; }
+.prob-desc { font-size: 12px; color: var(--text-body); line-height: 1.4; }
+.phone-dots { display: flex; justify-content: center; gap: 5px; padding-bottom: 2px; }
+.p-dot { width: 16px; height: 3px; border-radius: 2px; background: rgba(255,255,255,0.15); transition: 0.3s; }
+.p-dot.active { background: var(--max-blue); }
+
+.bot-section {
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  gap: 48px;
+  align-items: center;
+}
+.shot {
+  border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px;
+  background: rgba(10, 14, 26, 0.5); backdrop-filter: blur(14px); padding: 12px;
+}
+.shot-body { display: grid; grid-template-columns: 160px 1fr; min-height: 280px; border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; overflow: hidden; }
+.shot-nav { background: #0d101e; padding: 14px; }
+.shot-nav h4 { margin-bottom: 14px; font-size: 13px; font-weight: 700; color: #fff; }
+.nav-line { color: #8a91a6; font-size: 11.5px; padding: 7px 9px; border-radius: 7px; margin-bottom: 3px; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+.nav-line.active { color: #fff; background: rgba(63, 120, 255, 0.22); font-weight: 600; }
+.shot-main { background: #050710; padding: 16px; }
+.mock { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 10px; margin-bottom: 8px; }
+.mock b { font-size: 12.5px; color: #fff; display: flex; align-items: center; gap: 6px; font-weight: 600; }
+.mock small { display: block; color: var(--text-body); font-size: 11.5px; line-height: 1.35; margin-top: 3px; }
+
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.metric {
+  background: rgba(10, 14, 26, 0.35); backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 16px; padding: 22px 18px;
+}
+.metric strong {
+  font-size: 34px; font-weight: 700; letter-spacing: -0.02em;
+  background: var(--max-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  display: block; line-height: 1; margin-bottom: 8px;
+}
+.metric span { display: block; color: var(--text-body); font-size: 13px; line-height: 1.45; }
+
+.cta-block { text-align: center; padding: 36px 0 16px; }
+.cta-block h2 { font-size: clamp(28px, 3.2vw, 44px); font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; margin-bottom: 12px; }
+.cta-block p { color: var(--text-body); font-size: 16px; line-height: 1.55; max-width: 620px; margin: 0 auto 24px; }
+
+.footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.06); padding: 24px 0;
+  color: var(--text-muted); font-size: 12.5px; display: flex; justify-content: space-between;
+}
+
+.back-to-orbit-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 22px; padding: 12px 18px;
+  background: rgba(10, 14, 26, 0.4); backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 14px;
+}
+.back-orbit-btn {
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 12.5px;
+  cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.2s;
+  font-family: var(--font-ui);
+}
+.back-orbit-btn svg { width: 14px; height: 14px; fill: currentColor; }
+.back-orbit-btn:hover {
+  background: rgba(63, 120, 255, 0.18); border-color: var(--max-blue);
+}
+
+.blurred-panel {
+  background: rgba(10, 14, 26, 0.24); backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 16px; padding: 24px; margin-bottom: 18px;
+}
+
+.transparent-module-block {
+  background: transparent !important;
+  border: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.workspace-title-block { margin-bottom: 18px; }
+.workspace-title-block h2 { font-size: 28px; font-weight: 700; letter-spacing: -0.02em; margin-top: 4px; }
+
+.day-picker {
+  display: flex; gap: 6px; margin-bottom: 18px;
+  background: rgba(6, 9, 18, 0.45); padding: 4px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.day-btn {
+  flex: 1; background: transparent; border: none; color: #94a3b8;
+  padding: 10px 0; border-radius: 8px; font-weight: 600; font-size: 13.5px; cursor: pointer; transition: 0.2s;
+  font-family: var(--font-ui);
+}
+.day-btn:hover { color: #fff; background: rgba(255, 255, 255, 0.04); }
+.day-btn.active {
+  background: var(--max-gradient); color: #fff;
+}
+
+.list-item {
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 18px;
+  background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 12px; margin-bottom: 8px;
+}
+.list-item-num {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: rgba(63, 120, 255, 0.12); border: 1px solid rgba(63, 120, 255, 0.25); color: #18b5ea;
+  display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;
+}
+.list-item-info h4 { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 2px; display: flex; align-items: center; gap: 8px; }
+.list-item-sub { font-size: 12.5px; color: var(--text-body); }
+.time-tag {
+  font-size: 12px; padding: 5px 10px; background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07); border-radius: 6px; font-weight: 600; color: #cbd5e1; font-family: var(--font-ui);
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.time-tag svg { width: 13px; height: 13px; fill: #18b5ea; }
+
+.badge { font-size: 10.5px; font-weight: 700; padding: 4px 8px; border-radius: 6px; text-transform: uppercase; font-family: var(--font-ui); display: inline-flex; align-items: center; gap: 4px; }
+.badge svg { width: 11px; height: 11px; fill: currentColor; }
+.badge.pending { color: var(--accent-amber); background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.25); }
+.badge.done { color: var(--accent-emerald); background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.25); }
+
+.consultations-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+.robot-photo-container { margin-top: 10px; border-radius: 8px; overflow: hidden; height: 140px; background: #000; }
+.robot-photo-container img { width: 100%; height: 100%; object-fit: cover; }
+
+.nutrition-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.meal-card {
+  background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 14px;
+  padding: 18px; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px;
+}
+.meal-title { font-size: 16px; font-weight: 600; margin: 8px 0 5px; }
+.meal-desc { color: var(--text-body); font-size: 12.5px; line-height: 1.45; flex-grow: 1; margin-bottom: 16px; }
+
+.form-group { margin-bottom: 14px; text-align: left; }
+.form-group label { display: block; font-size: 11px; text-transform: uppercase; color: var(--text-muted); font-weight: 700; margin-bottom: 5px; font-family: var(--font-ui); }
+.form-control {
+  width: 100%; background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #fff; padding: 10px 12px; border-radius: 8px; font-size: 13.5px; outline: none; font-family: var(--font-main);
+}
+.form-control:focus { border-color: var(--max-blue); }
+
+.auth-container { max-width: 440px; margin: 16px auto; }
+.auth-toggle { display: flex; gap: 4px; margin-bottom: 18px; background: rgba(0,0,0,0.4); padding: 4px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.06); }
+.auth-toggle-btn { flex: 1; padding: 9px; border: none; background: none; color: #8a91a6; font-weight: 600; font-size: 13px; border-radius: 7px; cursor: pointer; font-family: var(--font-ui); }
+.auth-toggle-btn.active { background: var(--max-gradient); color: #fff; }
+
+.profile-fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 18px 0; }
+.profile-input-card { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 10px; padding: 10px 14px; }
+.field-lbl { font-size: 10.5px; color: var(--text-muted); text-transform: uppercase; font-weight: 700; margin-bottom: 2px; display: block; font-family: var(--font-ui); }
+.field-inp { background: none; border: none; color: #fff; font-size: 14px; font-weight: 600; outline: none; width: 100%; font-family: var(--font-main); }
+
+.mobile-nav {
+  position: fixed; bottom: 0; left: 0; right: 0; height: 60px; background: var(--bar);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.06); display: none;
+  justify-content: space-around; align-items: center; z-index: 100;
+}
+.mobile-nav-item {
+  background: none; border: none; color: #8a91a6; display: flex; flex-direction: column;
+  align-items: center; gap: 2px; font-size: 10.5px; font-weight: 600; cursor: pointer; font-family: var(--font-ui);
+}
+.mobile-nav-item svg { width: 16px; height: 16px; fill: currentColor; }
+.mobile-nav-item.active { color: #18b5ea; }
+.mobile-nav-item.locked { opacity: 0.4; pointer-events: none; }
+
+.hidden { display: none !important; }
+
+@media(max-width: 1024px) {
+  .planets-orbit-grid, .metrics { grid-template-columns: repeat(2, 1fr); }
+  .topbar-nav { display: none; }
+  .mobile-nav { display: flex; }
+  .hero-layout, .bot-section, .problems-section-grid, .consultations-grid, .nutrition-grid { grid-template-columns: 1fr; gap: 32px; }
+  .home-section { padding: 50px 0; }
+}
+@media(max-width: 600px) {
+  .topbar { padding: 0 16px; }
+  .content { padding: 0 16px 50px; }
+  .planets-orbit-grid, .metrics { grid-template-columns: 1fr; }
+  .hero-layout h1 { font-size: 28px; }
+  .hero-layout p { font-size: 15px; }
+  .cta-block h2 { font-size: 24px; }
+  .profile-fields-grid { grid-template-columns: 1fr; }
+  .shot-body { grid-template-columns: 1fr; } .shot-nav { display: none; }
+  .home-section { padding: 40px 0; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="spaceCanvas"></canvas>
+<div class="cosmic-vignette"></div>
+<div id="approachPlanetBg"></div>
+<div id="spaceDiveOverlay"></div>
+
+<header class="topbar">
+  <div class="brand" onclick="approachPlanetTransition('home')">
+    <div class="logo-max">
+      <svg viewBox="0 0 24 24"><path d="M12 3 1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4.18L12 17l-7-3.82Z"/></svg>
+    </div>
+    <div>
+      <div class="brand-name">Школа<span>.MAX</span></div>
+      <div class="brand-sub">Сервисы Сферум</div>
+    </div>
+  </div>
+
+  <nav class="topbar-nav">
+    <button class="nav-link-btn active" id="btn-home" onclick="approachPlanetTransition('home')">
+      <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      Главная
+    </button>
+    <button class="nav-link-btn locked" id="btn-schedule" onclick="handleLockedNavClick('schedule')">
+      <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4.18L12 17l-7-3.82Z"/></svg>
+      Учёба
+    </button>
+    <button class="nav-link-btn locked" id="btn-tasks" onclick="handleLockedNavClick('tasks')">
+      <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+      Календарь
+    </button>
+    <button class="nav-link-btn locked" id="btn-canteen" onclick="handleLockedNavClick('canteen')">
+      <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.43 4.38l-.43 7.62h2l-.43-7.62C9.54 12.9 11 11.12 11 9zm5-7v18h2V12h2V2h-4z"/></svg>
+      Питание
+    </button>
+    <button class="nav-link-btn" id="btn-profile" onclick="approachPlanetTransition('profile')">
+      <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+      Аккаунт
+    </button>
+  </nav>
+
+  <div class="topbar-right-badge" id="headerRoleBadge">
+    <svg viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm0 3.5L19.8 19H4.2L12 5.5z"/></svg>
+    <span id="headerRoleText">Гость (войдите в аккаунт)</span>
+  </div>
+</header>
+
+<div class="wrap"><main class="content">
+
+  <!-- ГЛАВНАЯ СТРАНИЦА -->
+  <section id="tab-home" class="tab-content active">
+    
+    <div class="home-section animate-on-scroll" id="sec-hero">
+      <div class="hero-layout">
+        <div>
+          <div class="kicker">
+            <svg style="width:14px; height:14px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Школьные сервисы на платформе MAX
+          </div>
+          <h1>
+            Расписание уроков, задания и столовая
+            <span class="gradient-word">в одном окне</span>
+          </h1>
+          <p>Единый интерфейс вместо десятка чатов и ссылок: звонки, дедлайны по предметам, табель успеваемости и предварительный заказ обедов.</p>
+          
+          <div class="actions">
+            <button class="btn-max" onclick="checkAuthAndGo('schedule')">
+              <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+              Открыть расписание
+            </button>
+            <button class="btn-max secondary" onclick="document.querySelector('#sec-planets').scrollIntoView({behavior: 'smooth'})">
+              <svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
+              К разделам
+            </button>
+          </div>
+        </div>
+
+        <div class="preview hero-preview-float">
+          <div class="window-dots"><span></span><span></span><span></span></div>
+          <div class="phone">
+            <div class="chat-head">
+              <div class="bot-avatar">
+                <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4.18L12 17l-7-3.82Z"/></svg>
+              </div>
+              <div>
+                <div class="bot-name">Школа.MAX <span class="bot-verified">✓</span></div>
+                <div class="bot-status" id="botStatusText">Бот Сферум · онлайн</div>
+              </div>
+            </div>
+            
+            <div class="chat-messages" id="chatBox">
+              <div class="bubble user">
+                Какое расписание на завтра?
+                <div class="msg-time">13:58 <span class="msg-ticks">✓✓</span></div>
+              </div>
+              
+              <div class="bubble bot">
+                Завтра 5 уроков: физика (каб. 302), алгебра (каб. 210), русский язык, история и информатика.
+                <div class="msg-time">13:58</div>
+              </div>
+
+              <div class="bubble user">
+                Что сегодня в столовой?
+                <div class="msg-time">13:59 <span class="msg-ticks">✓✓</span></div>
+              </div>
+
+              <div class="bubble bot">
+                Обед: куриный суп, мясная котлета с картофельным пюре и компот.
+                <div class="msg-time">13:59</div>
+              </div>
+            </div>
+
+            <form class="chat-input-bar" id="chatInputForm">
+              <input type="text" id="chatInputField" class="chat-input-field" placeholder="Спросить расписание или меню..." autocomplete="off">
+              <button type="submit" class="chat-send-btn">
+                <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-section animate-on-scroll" id="sec-planets">
+      <div class="section-header-center">
+        <div class="kicker">Разделы системы</div>
+        <h2>Основные модули</h2>
+        <p>Каждая задача вынесена в отдельный тематический экран</p>
+      </div>
+
+      <div class="planets-orbit-grid">
+        <article class="planet-card p-knowledge" onclick="checkAuthAndGo('schedule')">
+          <div class="planet-sphere-wrap">
+            <div class="planet-sphere"></div>
+            <div class="planet-ring"></div>
+          </div>
+          <h3 class="planet-title">Учёба</h3>
+          <div class="planet-sub">Планета Знаний</div>
+          <p class="planet-desc">Расписание звонков, кабинеты, имена учителей и запись на консультации.</p>
+          <div class="planet-jump-btn">Открыть уроки</div>
+        </article>
+
+        <article class="planet-card p-time" onclick="checkAuthAndGo('tasks')">
+          <div class="planet-sphere-wrap"><div class="planet-sphere"></div></div>
+          <h3 class="planet-title">Календарь</h3>
+          <div class="planet-sub">Планета Времени</div>
+          <p class="planet-desc">Домашние задания, дедлайны лабораторных работ и разбор сложных тем.</p>
+          <div class="planet-jump-btn">Смотреть дедлайны</div>
+        </article>
+
+        <article class="planet-card p-energy" onclick="checkAuthAndGo('canteen')">
+          <div class="planet-sphere-wrap"><div class="planet-sphere"></div></div>
+          <h3 class="planet-title">Питание</h3>
+          <div class="planet-sub">Планета Энергии</div>
+          <p class="planet-desc">Ежедневное меню школьной столовой и предварительный заказ порций.</p>
+          <div class="planet-jump-btn">Выбрать обед</div>
+        </article>
+
+        <article class="planet-card p-station" onclick="approachPlanetTransition('profile')">
+          <div class="planet-sphere-wrap"><div class="planet-sphere"></div></div>
+          <h3 class="planet-title">Аккаунт</h3>
+          <div class="planet-sub">Орбитальная Станция</div>
+          <p class="planet-desc">Электронный табель, оценки из «Моя Школа» и подтверждение через Госуслуги.</p>
+          <div class="planet-jump-btn">Войти в профиль</div>
+        </article>
+      </div>
+    </div>
+
+    <div class="home-section animate-on-scroll" id="sec-problems">
+      <div class="problems-section-grid">
+        <div>
+          <div class="kicker">Проблема</div>
+          <h2 style="font-size:34px; line-height:1.2; margin:10px 0 16px; font-weight:700;">Слишком много неструктурированных чатов</h2>
+          <p style="color:var(--text-body); font-size:16.5px; line-height:1.6; margin-bottom:18px;">
+            Учебные материалы, ссылки на журнал, замены кабинетов и списки дежурств теряются в общем потоке сообщений класса. В результате ученики пропускают дедлайны, а учителя повторяют одну и ту же информацию.
+          </p>
+        </div>
+
+        <div class="phone-glow-wrapper phone-glow-wrapper-float" id="phoneContainer">
+          <div class="iphone-mockup" id="tiltIphone">
+            <div class="dynamic-island"></div>
+            <div class="phone-content">
+              <div class="prob-num" id="probNum">01 / Ситуация</div>
+              <div class="problem-slide" id="probSlide">
+                <div class="pixel-3d-container">
+                  <svg id="pixelArtSvg" width="60" height="60" viewBox="0 0 32 32"></svg>
+                </div>
+                <h3 class="prob-title" id="probTitle">Разрозненные каналы</h3>
+                <p class="prob-desc" id="probDesc">Файлы, задания и столовая разнесены по разным сайтам и мессенджерам.</p>
+              </div>
+              <div class="phone-dots">
+                <div class="p-dot active"></div><div class="p-dot"></div><div class="p-dot"></div><div class="p-dot"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-section animate-on-scroll" id="sec-bot">
+      <div class="bot-section">
+        <div>
+          <div class="kicker">Интеграция</div>
+          <h2 style="font-size:34px; line-height:1.2; margin:10px 0 16px; font-weight:700;">Чат-бот и веб-приложение</h2>
+          <p style="color:var(--text-body); font-size:16px; line-height:1.6;">
+            Бот в платформе MAX присылает короткие напоминания о заменах кабинетов и сроках сдачи. По одной кнопке в чате открывается этот веб-интерфейс с подробным расписанием и оценками.
+          </p>
+        </div>
+
+        <div class="shot">
+          <div class="shot-body">
+            <div class="shot-nav">
+              <h4>Школа.MAX</h4>
+              <div class="nav-line active">
+                <svg style="width:13px; height:13px; fill:currentColor;" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                Главная
+              </div>
+              <div class="nav-line">
+                <svg style="width:13px; height:13px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4.18L12 17l-7-3.82Z"/></svg>
+                Учёба
+              </div>
+              <div class="nav-line">
+                <svg style="width:13px; height:13px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                Календарь
+              </div>
+              <div class="nav-line">
+                <svg style="width:13px; height:13px; fill:currentColor;" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.43 4.38l-.43 7.62h2l-.43-7.62C9.54 12.9 11 11.12 11 9zm5-7v18h2V12h2V2h-4z"/></svg>
+                Питание
+              </div>
+            </div>
+            <div class="shot-main">
+              <h4 style="color:#fff; font-size:13px; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                <svg style="width:13px; height:13px; fill:#10b981;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                Статус бота
+              </h4>
+              <div class="mock">
+                <b>
+                  <svg style="width:13px; height:13px; fill:#18b5ea;" viewBox="0 0 24 24"><path d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+                  Замена кабинета
+                </b>
+                <small>Физика перенесена в кабинет 302</small>
+              </div>
+              <div class="mock">
+                <b>
+                  <svg style="width:13px; height:13px; fill:#f59e0b;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+                  Лабораторная работа
+                </b>
+                <small>Срок сдачи: 25 сентября</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="home-section animate-on-scroll" id="sec-metrics">
+      <div class="section-header-center">
+        <div class="kicker">Практическая польза</div>
+        <h2>Ключевые показатели</h2>
+      </div>
+
+      <div class="metrics">
+        <div class="metric"><strong>−40%</strong><span>просроченных заданий благодаря напоминаниям за 24 часа</span></div>
+        <div class="metric"><strong>2 часа</strong><span>экономии времени учителей в неделю на рутинных ответах и списках</span></div>
+        <div class="metric"><strong>100%</strong><span>доступность данных со смартфонов и компьютеров</span></div>
+        <div class="metric"><strong>0</strong><span>бумажных списков для предварительного заказа питания</span></div>
+      </div>
+    </div>
+
+    <div class="home-section animate-on-scroll cta-block" id="sec-cta">
+      <h2>Единая точка входа для школы</h2>
+      <p>Ученик видит уроки и дедлайны, учитель публикует задания классу, столовая заранее знает точное количество порций.</p>
+      <button class="btn-max" onclick="checkAuthAndGo('schedule')">
+        <svg viewBox="0 0 24 24"><path d="M5 13h11.86l-5.43 5.43 1.42 1.42L21.14 12l-8.29-8.29-1.42 1.42L16.86 11H5v2z"/></svg>
+        Открыть расписание уроков
+      </button>
+    </div>
+
+    <footer class="footer">
+      <span>Сферум · VK MAX</span>
+      <span>Школа.MAX</span>
+    </footer>
+  </section>
+
+  <!-- МОДУЛЬ 1: УЧЁБА -->
+  <section id="tab-schedule" class="tab-content">
+    <div class="back-to-orbit-bar">
+      <button class="back-orbit-btn" onclick="approachPlanetTransition('home')">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        На главную
+      </button>
+      <span style="font-size:11.5px; font-weight:700; color:#18b5ea; text-transform:uppercase; font-family:var(--font-ui);">Учёба</span>
+    </div>
+
+    <div class="workspace-title-block">
+      <div class="kicker">Расписание</div>
+      <h2>Уроки и звонки</h2>
+    </div>
+
+    <div class="day-picker">
+      <button class="day-btn active" onclick="changeDay(this, 1)">Понедельник</button>
+      <button class="day-btn" onclick="changeDay(this, 2)">Вторник</button>
+      <button class="day-btn" onclick="changeDay(this, 3)">Среда</button>
+      <button class="day-btn" onclick="changeDay(this, 4)">Четверг</button>
+      <button class="day-btn" onclick="changeDay(this, 5)">Пятница</button>
+    </div>
+
+    <div class="blurred-panel">
+      <div style="margin-bottom:12px; color:#18b5ea; font-size:12px; font-weight:700; text-transform:uppercase; font-family:var(--font-ui); display:flex; align-items:center; gap:6px;">
+        <svg style="width:14px; height:14px; fill:currentColor;" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg>
+        <span id="scheduleGradeTitle">11 «Б» класс</span>
+      </div>
+      <div id="scheduleListContainer"></div>
+    </div>
+
+    <div class="blurred-panel">
+      <h3 style="font-size:17px; margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <svg style="width:18px; height:18px; fill:#3f78ff;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+        Дополнительные занятия
+      </h3>
+      <div class="consultations-grid">
+        <div class="meal-card">
+          <div>
+            <h4 style="font-size:15px; color:#fff;">Кружок робототехники</h4>
+            <p style="font-size:12.5px; color:var(--text-body); margin:4px 0 8px;">Вторник и четверг · 15:30 (кабинет 312)</p>
+            <div class="robot-photo-container">
+              <img src="https://unlimbot.hb.ru-msk.vkcloud-storage.ru/uploads/981abbca56e54711ae7a6bf19e40a237457ad8587a36ee9a.jpg" alt="Робототехника">
+            </div>
+          </div>
+          <span class="badge pending" style="margin-top:12px; width:fit-content;">Идёт набор</span>
+        </div>
+
+        <div class="meal-card">
+          <div>
+            <h4 style="font-size:15px; color:#fff;">Консультация по алгебре</h4>
+            <p style="font-size:12.5px; color:var(--text-body); margin:4px 0 8px;">Пятница · 14:30 (кабинет 210)</p>
+            <p style="font-size:12.5px; color:var(--text-body); line-height:1.5;">Разбор заданий второй части профильного уровня. Преподаватель: Савинова А. Г.</p>
+          </div>
+          <span class="badge done" style="margin-top:12px; width:fit-content;">Обязательно</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- МОДУЛЬ 2: КАЛЕНДАРЬ -->
+  <section id="tab-tasks" class="tab-content">
+    <div class="back-to-orbit-bar">
+      <button class="back-orbit-btn" onclick="approachPlanetTransition('home')">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        На главную
+      </button>
+      <span style="font-size:11.5px; font-weight:700; color:var(--accent-amber); text-transform:uppercase; font-family:var(--font-ui);">Календарь</span>
+    </div>
+
+    <div class="workspace-title-block">
+      <div class="kicker" style="color:var(--accent-amber);">Задания</div>
+      <h2>Дедлайны и разбор</h2>
+    </div>
+
+    <!-- ИИ-ПОМОЩНИК -->
+    <div class="transparent-module-block" style="margin-bottom: 24px; border: 1px solid rgba(63, 120, 255, 0.25) !important; padding: 18px !important; border-radius: 14px;">
+      <h3 style="color: #18b5ea; margin-bottom: 8px; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+        <svg style="width:20px; height:20px; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg>
+        ИИ-разбор задания
+      </h3>
+      <p style="font-size: 12.5px; color: var(--text-body); margin-bottom: 12px;">Вставьте условие задачи или параграф, чтобы получить пошаговый план решения.</p>
+      <textarea id="aiInputText" class="form-control" rows="3" placeholder="Пример: Параграф 14, вопросы 1-4. Построить график зависимости скорости от времени..."></textarea>
+      <button class="btn-max" style="margin-top: 10px; width: 100%;" onclick="runAiAnalysis()" id="aiBtn">
+        Разобрать задание
+      </button>
+      
+      <div id="aiResult" class="hidden" style="margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.03); border-radius: 10px; border: 1px solid rgba(255,255,255,0.08);">
+        <h4 id="aiResTitle" style="color:#fff; margin-bottom: 6px; font-size: 14px;"></h4>
+        <div id="aiResEssence" style="font-size: 12.5px; color: #9bb7ff; margin-bottom: 10px;"></div>
+        <ul id="aiResSteps" style="font-size: 12.5px; color: var(--text-body); padding-left: 18px;"></ul>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns: 1.2fr 0.8fr; gap:22px;">
+      <div class="transparent-module-block">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:16px; display:flex; align-items:center; gap:8px;">
+            <svg style="width:18px; height:18px; fill:var(--accent-amber);" viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+            Текущие задания
+          </h3>
+          <span id="currentGradeBadge" style="font-size:12px; color:var(--text-muted); font-family:var(--font-ui); font-weight:600;">Класс: 11Б</span>
+        </div>
+        <div id="tasksListContainer"></div>
+      </div>
+
+      <div>
+        <!-- ФОРМА ПУБЛИКАЦИИ: ВИДНА ТОЛЬКО УЧИТЕЛЮ И АДМИНУ -->
+        <div id="teacherTaskForm" class="transparent-module-block hidden" style="margin-bottom:18px; border: 1px solid rgba(63, 120, 255, 0.3) !important; padding: 18px !important; border-radius: 14px; background: rgba(10, 14, 26, 0.45) !important;">
+          <h3 style="font-size:15.5px; margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;">
+            <span>Назначить задание</span>
+            <span style="font-size:10.5px; color:#18b5ea; background:rgba(24,181,234,0.15); padding:3px 8px; border-radius:6px; font-weight:700;">ПЕДАГОГ / АДМИН</span>
+          </h3>
+          <div class="form-group">
+            <label>Класс (кому назначить)</label>
+            <select id="taskTargetGrade" class="form-control">
+              <option value="11Б">Только 11 «Б»</option>
+              <option value="11А">Только 11 «А»</option>
+              <option value="10А">Только 10 «А»</option>
+              <option value="9А">Только 9 «А»</option>
+              <option value="all">Всем классам школы</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Предмет</label>
+            <input type="text" id="taskSubject" class="form-control" placeholder="Физика">
+          </div>
+          <div class="form-group">
+            <label>Название</label>
+            <input type="text" id="taskTitle" class="form-control" placeholder="Лабораторная работа №3">
+          </div>
+          <div class="form-group">
+            <label>Срок сдачи</label>
+            <input type="text" id="taskDeadline" class="form-control" placeholder="До 28 сентября">
+          </div>
+          <div class="form-group">
+            <label>Требования к работе</label>
+            <textarea id="taskDesc" class="form-control" rows="2" placeholder="Что нужно сделать..."></textarea>
+          </div>
+          <button class="btn-max" style="width:100%;" onclick="handlePublishTaskFromFrontend()" id="publishTaskBtn">Опубликовать для класса</button>
+        </div>
+
+        <div class="transparent-module-block">
+          <h4 style="font-size:14px; margin-bottom:6px;">Фильтрация заданий</h4>
+          <p style="font-size:12.5px; color:var(--text-body); line-height:1.5;">
+            Ученики видят только задания своего класса и общешкольные дедлайны. Публикация доступна педагогам и администраторам школы.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- МОДУЛЬ 3: ПИТАНИЕ -->
+  <section id="tab-canteen" class="tab-content">
+    <div class="back-to-orbit-bar">
+      <button class="back-orbit-btn" onclick="approachPlanetTransition('home')">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        На главную
+      </button>
+      <span style="font-size:11.5px; font-weight:700; color:var(--accent-emerald); text-transform:uppercase; font-family:var(--font-ui);">Столовая</span>
+    </div>
+
+    <div class="workspace-title-block">
+      <div class="kicker" style="color:var(--accent-emerald);">Меню</div>
+      <h2>Рацион на сегодня</h2>
+    </div>
+
+    <div class="transparent-module-block">
+      <div class="nutrition-grid" id="canteenMenuContainer"></div>
+    </div>
+  </section>
+
+  <!-- МОДУЛЬ 4: АККАУНТ -->
+  <section id="tab-profile" class="tab-content">
+    <div class="back-to-orbit-bar">
+      <button class="back-orbit-btn" onclick="approachPlanetTransition('home')">
+        <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+        На главную
+      </button>
+      <span style="font-size:11.5px; font-weight:700; color:#38c8f4; text-transform:uppercase; font-family:var(--font-ui);">Аккаунт</span>
+    </div>
+
+    <div class="workspace-title-block">
+      <div class="kicker">Профиль</div>
+      <h2>Учётная запись и дневник</h2>
+    </div>
+
+    <div id="authBox" class="blurred-panel auth-container">
+      <button type="button" class="btn-esia" onclick="handleEsiaLogin()" style="
+        width: 100%;
+        background: #0d4cd3;
+        color: #fff;
+        border: none;
+        border-radius: 10px;
+        padding: 12px 16px;
+        font-weight: 700;
+        font-size: 13.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        cursor: pointer;
+        margin-bottom: 14px;
+        transition: opacity 0.2s;
+      ">
+        <svg style="width:18px; height:18px; fill:#fff;" viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/>
+        </svg>
+        Войти через Госуслуги (ЕСИА)
+      </button>
+      <div style="text-align: center; color: var(--text-muted); font-size: 11.5px; margin-bottom: 14px;">
+        или логином / почтой Сферум
+      </div>
+
+      <div class="auth-toggle">
+        <button type="button" class="auth-toggle-btn active" id="btnModeLogin" onclick="switchAuthMode('login')">Вход</button>
+        <button type="button" class="auth-toggle-btn" id="btnModeRegister" onclick="switchAuthMode('register')">Регистрация</button>
+      </div>
+
+      <form id="authMainForm" onsubmit="handleAuthSubmit(event)">
+        <div id="registerFieldsGroup" class="hidden">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <div class="form-group">
+              <label>Имя</label>
+              <input type="text" id="regFirstName" class="form-control" placeholder="Григорий">
+            </div>
+            <div class="form-group">
+              <label>Фамилия</label>
+              <input type="text" id="regLastName" class="form-control" placeholder="Савинов">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Роль в системе</label>
+            <select id="regRoleSelect" class="form-control" onchange="toggleRegGradeField()">
+              <option value="student" selected>Ученик</option>
+              <option value="teacher">Учитель</option>
+            </select>
+          </div>
+
+          <div class="form-group" id="regGradeGroup">
+            <label>Класс</label>
+            <select id="regGrade" class="form-control">
+              <option value="11А">11 «А» класс</option>
+              <option value="11Б" selected>11 «Б» класс</option>
+              <option value="10А">10 «А» класс</option>
+              <option value="9А">9 «А» класс</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label id="lblEmailUsername">Почта или логин</label>
+          <input type="text" id="authEmailInput" class="form-control" placeholder="admin@school.ru или user@mail.ru" required>
+        </div>
+
+        <div class="form-group">
+          <label>Пароль</label>
+          <input type="password" id="authPasswordInput" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <button type="submit" id="btnAuthSubmit" class="btn-max" style="width:100%; margin-top:8px;">
+          Войти
+        </button>
+      </form>
+
+      <div id="verifyCodeGroup" class="hidden" style="text-align: center; padding-top: 8px;">
+        <p style="font-size: 12.5px; color: #9bb7ff; margin-bottom: 10px;" id="verifyNoticeText">
+          Код отправлен на вашу почту
+        </p>
+        <input type="text" id="inputVerifyCode" class="form-control" placeholder="Код из письма" style="text-align: center; font-size: 20px; letter-spacing: 4px; margin-bottom: 10px;" maxlength="6">
+        <button type="button" class="btn-max" style="width: 100%;" onclick="handleVerifyCodeSubmit()">
+          Подтвердить
+        </button>
+      </div>
+    </div>
+
+    <div id="userProfileBox" class="hidden transparent-module-block">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; padding-bottom:14px; border-bottom:1px solid rgba(255, 255, 255, 0.08);">
+        <div>
+          <h3 style="font-size:19px; font-weight:700;" id="profileDashboardName">Савинов Григорий</h3>
+          <div style="font-size:12.5px; color:var(--text-body); margin-top:2px;">Сферум ID: <b style="color:#fff;" id="fieldSferumId">user_wf10492</b></div>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn-max secondary" style="width:auto; padding:8px 14px; font-size:12.5px;" onclick="syncWithMoyaShkola()" id="syncBtn">
+            Синхронизировать с «Моя Школа»
+          </button>
+          <button class="btn-max secondary" style="padding:8px 14px; font-size:12.5px;" onclick="handleLogout()">Выйти</button>
+        </div>
+      </div>
+
+      <div class="profile-fields-grid">
+        <div class="profile-input-card"><span class="field-lbl">Почта</span><input type="text" id="fieldEmail" class="field-inp" disabled></div>
+        <div class="profile-input-card" id="profileClassCard"><span class="field-lbl">Класс</span><input type="text" id="fieldClass" class="field-inp" disabled></div>
+        <div class="profile-input-card">
+          <span class="field-lbl">Никнейм (можно менять раз в 10 дней)</span>
+          <div style="display:flex; gap:6px; margin-top:2px;">
+            <input type="text" id="fieldNicknameInput" class="field-inp" style="background:#070912; padding:4px 6px; border-radius:6px; border:1px solid rgba(255,255,255,0.08);">
+            <button class="btn-max secondary" style="padding:4px 10px; font-size:11px;" onclick="handleSaveNickname()">Сохранить</button>
+          </div>
+          <small id="nicknameNotice" style="font-size:10.5px; color:var(--text-muted); display:block; margin-top:4px;"></small>
+        </div>
+        <div class="profile-input-card"><span class="field-lbl">Роль в системе</span><input type="text" id="fieldRole" class="field-inp" disabled></div>
+      </div>
+
+      <div style="margin-top:22px;" id="gradesSectionContainer">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:16px;">Успеваемость (ФГИС «Моя Школа»)</h3>
+          <span style="font-size:11.5px; color:#18b5ea; font-weight:600;" id="lastSyncTime">Обновлено</span>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap:10px;" id="gradesContainer">
+          <div class="list-item"><div><h4>Алгебра</h4><div class="list-item-sub">Ср. балл: 4.80</div></div><strong style="color:var(--accent-emerald); font-size:17px;">5</strong></div>
+          <div class="list-item"><div><h4>Физика</h4><div class="list-item-sub">Ср. балл: 4.50</div></div><strong style="color:var(--accent-emerald); font-size:17px;">5</strong></div>
+          <div class="list-item"><div><h4>Информатика</h4><div class="list-item-sub">Ср. балл: 5.00</div></div><strong style="color:var(--accent-emerald); font-size:17px;">5</strong></div>
+          <div class="list-item"><div><h4>Русский язык</h4><div class="list-item-sub">Ср. балл: 4.25</div></div><strong style="color:#60a5fa; font-size:17px;">4</strong></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main></div>
+
+<nav class="mobile-nav">
+  <button class="mobile-nav-item active" id="mbtn-home" onclick="approachPlanetTransition('home')">
+    <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+    Главная
+  </button>
+  <button class="mobile-nav-item locked" id="mbtn-schedule" onclick="handleLockedNavClick('schedule')">
+    <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4.18L12 17l-7-3.82Z"/></svg>
+    Уроки
+  </button>
+  <button class="mobile-nav-item locked" id="mbtn-tasks" onclick="handleLockedNavClick('tasks')">
+    <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+    Задачи
+  </button>
+  <button class="mobile-nav-item locked" id="mbtn-canteen" onclick="handleLockedNavClick('canteen')">
+    <svg viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.46 3.9 3.43 4.38l-.43 7.62h2l-.43-7.62C9.54 12.9 11 11.12 11 9zm5-7v18h2V12h2V2h-4z"/></svg>
+    Обед
+  </button>
+  <button class="mobile-nav-item" id="mbtn-profile" onclick="approachPlanetTransition('profile')">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+    Профиль
+  </button>
+</nav>
+
+<script>
+let currentAuthMode = 'login';
+let pendingEmail = sessionStorage.getItem('pendingEmail') || '';
+
+function switchAuthMode(mode) {
+  currentAuthMode = mode;
+  const btnLogin = document.getElementById('btnModeLogin');
+  const btnRegister = document.getElementById('btnModeRegister');
+  const regGroup = document.getElementById('registerFieldsGroup');
+  const submitBtn = document.getElementById('btnAuthSubmit');
+  const lblEmail = document.getElementById('lblEmailUsername');
+  
+  const mainForm = document.getElementById('authMainForm');
+  const verifyGroup = document.getElementById('verifyCodeGroup');
+  if (mainForm) mainForm.classList.remove('hidden');
+  if (verifyGroup) verifyGroup.classList.add('hidden');
+
+  if (mode === 'login') {
+    btnLogin.classList.add('active');
+    btnRegister.classList.remove('active');
+    regGroup.classList.add('hidden');
+    submitBtn.textContent = 'Войти';
+    lblEmail.textContent = 'Почта или логин';
+  } else {
+    btnRegister.classList.add('active');
+    btnLogin.classList.remove('active');
+    regGroup.classList.remove('hidden');
+    submitBtn.textContent = 'Зарегистрироваться';
+    lblEmail.textContent = 'Ваша почта';
+    toggleRegGradeField();
+  }
+}
+
+function toggleRegGradeField() {
+  const roleSel = document.getElementById('regRoleSelect');
+  const gradeGrp = document.getElementById('regGradeGroup');
+  if (!roleSel || !gradeGrp) return;
+  if (roleSel.value === 'teacher') {
+    gradeGrp.classList.add('hidden');
+  } else {
+    gradeGrp.classList.remove('hidden');
+  }
+}
+
+async function handleAuthSubmit(event) {
+  event.preventDefault();
+  const email = document.getElementById('authEmailInput').value.trim();
+  const password = document.getElementById('authPasswordInput').value.trim();
+  const btn = document.getElementById('btnAuthSubmit');
+
+  if (!email || !password) {
+    alert('Заполните все поля');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = currentAuthMode === 'login' ? 'Вход...' : 'Регистрация...';
+
+  try {
+    if (currentAuthMode === 'register') {
+      const firstName = document.getElementById('regFirstName').value.trim() || 'Пользователь';
+      const lastName = document.getElementById('regLastName').value.trim() || '';
+      const role = document.getElementById('regRoleSelect').value || 'student';
+      const grade = role === 'teacher' ? '' : (document.getElementById('regGrade').value || '11Б');
+
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+          first_name: firstName,
+          last_name: lastName,
+          grade: grade,
+          role: role
+        })
+      });
+      const textResp = await res.text();
+      let data;
+      try {
+        data = JSON.parse(textResp);
+      } catch (e) {
+        throw new Error("Ошибка сервера: " + textResp);
+      }
+
+      if (!res.ok) {
+        let msg = data.detail;
+        if (typeof msg === 'object') msg = JSON.stringify(msg);
+        throw new Error(msg || 'Ошибка регистрации');
+      }
+
+      pendingEmail = email;
+      sessionStorage.setItem('pendingEmail', email);
+
+      document.getElementById('authMainForm').classList.add('hidden');
+      document.getElementById('verifyCodeGroup').classList.remove('hidden');
+      document.getElementById('verifyNoticeText').textContent = `Код подтверждения отправлен на почту ${email}`;
+      document.getElementById('inputVerifyCode').value = '';
+      document.getElementById('inputVerifyCode').focus();
+
+    } else {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      });
+      const textResp = await res.text();
+      let data;
+      try {
+        data = JSON.parse(textResp);
+      } catch (e) {
+        throw new Error("Ошибка сервера: " + textResp);
+      }
+
+      if (!res.ok) {
+        let msg = data.detail;
+        if (typeof msg === 'object') msg = JSON.stringify(msg);
+        throw new Error(msg || 'Неверная почта или пароль');
+      }
+
+      localStorage.setItem('sferum_user', JSON.stringify(data.user));
+      applyUserDataToInterface(data.user);
+      if (data.grades) renderGrades(data.grades);
+      await loadTasksData();
+      alert('Успешный вход!');
+    }
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = currentAuthMode === 'login' ? 'Войти' : 'Зарегистрироваться';
+  }
+}
+
+async function handleVerifyCodeSubmit() {
+  const email = pendingEmail || sessionStorage.getItem('pendingEmail');
+  const code = document.getElementById('inputVerifyCode').value.trim();
+
+  if (!email) {
+    alert('Email регистрации не найден. Повторите регистрацию.');
+    return;
+  }
+  if (!code || code.length !== 6) {
+    alert('Введите 6 цифр кода подтверждения');
+    return;
+  }
+
+  const btn = document.querySelector('#verifyCodeGroup button');
+  if (btn) btn.disabled = true;
+
+  try {
+    const res = await fetch('/api/auth/verify-code', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, code: code })
+    });
+    const textResp = await res.text();
+    let data;
+    try {
+      data = JSON.parse(textResp);
+    } catch (e) {
+      throw new Error("Ошибка сервера: " + textResp);
+    }
+
+    if (!res.ok) {
+      let msg = data.detail;
+      if (typeof msg === 'object') msg = JSON.stringify(msg);
+      throw new Error(msg || 'Неверный код');
+    }
+
+    pendingEmail = '';
+    sessionStorage.removeItem('pendingEmail');
+
+    document.getElementById('verifyCodeGroup').classList.add('hidden');
+    document.getElementById('authMainForm').classList.remove('hidden');
+
+    alert('Почта успешно подтверждена! Теперь вы можете войти.');
+    switchAuthMode('login');
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+}
+
+const canvas = document.getElementById('spaceCanvas');
+const ctx = canvas.getContext('2d');
+const approachPlanetBg = document.getElementById('approachPlanetBg');
+const spaceDiveOverlay = document.getElementById('spaceDiveOverlay');
+
+let stars = [];
+const numStars = 110;
+let timeCount = 0;
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas, { passive: true });
+resizeCanvas();
+
+function initStars() {
+  stars = [];
+  for (let i = 0; i < numStars; i++) {
+    stars.push({
+      x: (Math.random() - 0.5) * window.innerWidth * 2,
+      y: (Math.random() - 0.5) * window.innerHeight * 2,
+      z: Math.random() * window.innerWidth,
+      size: Math.random() * 1.4 + 0.4,
+      twinkleSpeed: Math.random() * 0.03 + 0.01,
+      twinklePhase: Math.random() * Math.PI * 2,
+      color: Math.random() > 0.6 ? '#18b5ea' : (Math.random() > 0.3 ? '#3f78ff' : '#ffffff')
+    });
+  }
+}
+initStars();
+
+function animateSpace() {
+  timeCount += 0.015;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const cx = canvas.width / 2;
+  const cy = canvas.height / 2;
+
+  const neb1 = ctx.createRadialGradient(cx * 0.4, cy * 0.5, 50, cx * 0.4, cy * 0.5, 450);
+  neb1.addColorStop(0, 'rgba(24, 181, 234, 0.09)');
+  neb1.addColorStop(0.5, 'rgba(63, 120, 255, 0.04)');
+  neb1.addColorStop(1, 'transparent');
+  ctx.fillStyle = neb1;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const neb2 = ctx.createRadialGradient(cx * 1.6, cy * 1.2, 80, cx * 1.6, cy * 1.2, 500);
+  neb2.addColorStop(0, 'rgba(118, 69, 255, 0.08)');
+  neb2.addColorStop(0.6, 'rgba(63, 120, 255, 0.03)');
+  neb2.addColorStop(1, 'transparent');
+  ctx.fillStyle = neb2;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const scrollOffset = window.scrollY * 0.15;
+
+  for (let i = 0; i < stars.length; i++) {
+    let s = stars[i];
+    s.z -= 0.35;
+    if (s.z <= 0) {
+      s.z = canvas.width;
+      s.x = (Math.random() - 0.5) * canvas.width * 2;
+      s.y = (Math.random() - 0.5) * canvas.height * 2;
+    }
+
+    let k = 260 / s.z;
+    let px = s.x * k + cx;
+    let py = (s.y - scrollOffset) * k + cy;
+
+    if (px >= 0 && px <= canvas.width && py >= 0 && py <= canvas.height) {
+      let twinkle = (Math.sin(timeCount * 2 + s.twinklePhase) + 1) / 2 * 0.4 + 0.6;
+      let alpha = Math.min(0.85, Math.max(0.15, (1 - s.z / canvas.width) * twinkle));
+
+      ctx.fillStyle = s.color;
+      ctx.globalAlpha = alpha;
+      let radius = Math.max(0.5, (1 - s.z / canvas.width) * s.size * 1.4);
+      
+      ctx.beginPath();
+      ctx.arc(px, py, radius, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+  ctx.globalAlpha = 1.0;
+  requestAnimationFrame(animateSpace);
+}
+requestAnimationFrame(animateSpace);
+
+function setupAlwaysActiveScrollAnimations() {
+  const animatedElements = document.querySelectorAll('.animate-on-scroll');
+  
+  if (!('IntersectionObserver' in window)) {
+    animatedElements.forEach(el => el.classList.add('in-view'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+      } else {
+        entry.target.classList.remove('in-view');
+      }
+    });
+  }, {
+    threshold: 0.12,
+    rootMargin: '0px 0px -40px 0px'
+  });
+
+  animatedElements.forEach(el => observer.observe(el));
+}
+
+const planetLaunchTrajectories = {
+  'schedule': { gradient: 'radial-gradient(circle at 30% 30%, #e9d5ff, #8b5cf6 50%, #2e064e 90%)', left: '25%', top: '38%' },
+  'tasks': { gradient: 'radial-gradient(circle at 30% 30%, #fef3c7, #f59e0b 50%, #682d09 90%)', left: '72%', top: '32%' },
+  'canteen': { gradient: 'radial-gradient(circle at 30% 30%, #d1fae5, #10b981 50%, #04382a 90%)', left: '30%', top: '70%' },
+  'profile': { gradient: 'radial-gradient(circle at 30% 30%, #cffafe, #18b5ea 50%, #062836 90%)', left: '78%', top: '68%' },
+  'home': { gradient: 'radial-gradient(circle at 30% 30%, #38c8f4, #3f78ff 50%, #7645ff 90%)', left: '50%', top: '50%' }
+};
+
+let isApproaching = false;
+function approachPlanetTransition(tabName) {
+  if (isApproaching) return;
+  isApproaching = true;
+  const traj = planetLaunchTrajectories[tabName] || planetLaunchTrajectories['home'];
+  approachPlanetBg.style.left = traj.left;
+  approachPlanetBg.style.top = traj.top;
+  approachPlanetBg.style.background = traj.gradient;
+  approachPlanetBg.classList.add('approaching');
+  spaceDiveOverlay.classList.add('active');
+
+  setTimeout(() => {
+    switchTabDirect(tabName);
+    setTimeout(() => {
+      approachPlanetBg.classList.remove('approaching');
+      spaceDiveOverlay.classList.remove('active');
+      isApproaching = false;
+    }, 120);
+  }, 400);
+}
+
+function isUserLoggedIn() {
+  return localStorage.getItem('sferum_user') !== null;
+}
+
+function checkAuthAndGo(tabName) {
+  if (!isUserLoggedIn()) {
+    alert('Для доступа к этому разделу необходимо войти в аккаунт');
+    approachPlanetTransition('profile');
+    return;
+  }
+  approachPlanetTransition(tabName);
+}
+
+function handleLockedNavClick(tabName) {
+  if (!isUserLoggedIn()) {
+    alert('Раздел доступен только авторизованным пользователям. Перейдите во вкладку "Аккаунт" для входа.');
+    approachPlanetTransition('profile');
+    return;
+  }
+  approachPlanetTransition(tabName);
+}
+
+function updateNavLockState() {
+  const loggedIn = isUserLoggedIn();
+  const tabs = ['schedule', 'tasks', 'canteen'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`btn-${t}`);
+    const mbtn = document.getElementById(`mbtn-${t}`);
+    if (loggedIn) {
+      if (btn) btn.classList.remove('locked');
+      if (mbtn) mbtn.classList.remove('locked');
+    } else {
+      if (btn) btn.classList.add('locked');
+      if (mbtn) mbtn.classList.add('locked');
+    }
+  });
+}
+
+function switchTabDirect(tabName) {
+  if (!isUserLoggedIn() && tabName !== 'home' && tabName !== 'profile') {
+    alert('Пожалуйста, войдите в аккаунт');
+    approachPlanetTransition('profile');
+    return;
+  }
+
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-link-btn').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.mobile-nav-item').forEach(el => el.classList.remove('active'));
+
+  const targetTab = document.getElementById(`tab-${tabName}`);
+  if (targetTab) targetTab.classList.add('active');
+  const desktopBtn = document.getElementById(`btn-${tabName}`);
+  const mobileBtn = document.getElementById(`mbtn-${tabName}`);
+  if (desktopBtn) desktopBtn.classList.add('active');
+  if (mobileBtn) mobileBtn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  if (tabName === 'tasks') {
+    loadTasksData();
+  }
+
+  if (tabName === 'home') {
+    setupAlwaysActiveScrollAnimations();
+  }
+}
+
+const situations = [
+  { num: '01 / Проблема', title: 'Разрозненные каналы', desc: 'Файлы, задания и столовая разнесены по разным сайтам и мессенджерам.', svg: '<circle cx="16" cy="16" r="10" fill="none" stroke="#18b5ea" stroke-width="2"/><circle cx="16" cy="16" r="4" fill="#3f78ff"/>' },
+  { num: '02 / Проблема', title: 'Пропущенные сроки', desc: 'Даты проверочных работ теряются в общем потоке переписки класса.', svg: '<path fill="#f59e0b" d="M16 6v10l6 3"/><circle cx="16" cy="16" r="12" fill="none" stroke="#f59e0b" stroke-width="2"/>' },
+  { num: '03 / Проблема', title: 'Ручной подсчёт питания', desc: 'Учителя вручную пересчитывают порции каждый день перед уроками.', svg: '<path fill="#10b981" d="M12 4h8v4h-8zm0 8h8v4h-8zm0 8h8v4h-8zM6 4h4v4H6zm0 8h4v4H6zm0 8h4v4H6z"/>' },
+  { num: '04 / Проблема', title: 'Потеря расписания', desc: 'Замены кабинетов не доходят до учеников вовремя.', svg: '<circle cx="16" cy="16" r="10" fill="none" stroke="#3f78ff" stroke-width="2"/><path d="M16 10v6l4 2" stroke="#3f78ff" stroke-width="2"/>' }
+];
+
+let sitIdx = 0;
+function nextSituation() {
+  sitIdx = (sitIdx + 1) % situations.length;
+  const s = situations[sitIdx];
+  const slide = document.getElementById('probSlide');
+  if (slide) {
+    slide.style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('probNum').textContent = s.num;
+      document.getElementById('probTitle').textContent = s.title;
+      document.getElementById('probDesc').textContent = s.desc;
+      document.getElementById('pixelArtSvg').innerHTML = s.svg;
+      document.querySelectorAll('.p-dot').forEach((d, i) => d.classList.toggle('active', i === sitIdx));
+      slide.style.opacity = '1';
+    }, 180);
+  }
+}
+setInterval(nextSituation, 4200);
+
+const chatBox = document.getElementById('chatBox');
+const botStatusText = document.getElementById('botStatusText');
+
+if (document.getElementById('chatInputForm')) {
+  document.getElementById('chatInputForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    const f = document.getElementById('chatInputField');
+    const val = f.value.trim();
+    if (!val) return;
+
+    const now = new Date();
+    const time = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    
+    chatBox.insertAdjacentHTML('beforeend', `
+      <div class="bubble user">${val}<div class="msg-time">${time} <span class="msg-ticks">✓✓</span></div></div>
+    `);
+    f.value = '';
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    botStatusText.textContent = 'печатает...';
+
+    setTimeout(() => {
+      botStatusText.textContent = 'Бот Сферум · онлайн';
+      const lower = val.toLowerCase();
+      let reply = 'Открываю нужный раздел.';
+
+      if (lower.includes('расписание') || lower.includes('урок') || lower.includes('завтра')) {
+        reply = 'Завтра 5 уроков: физика (302), алгебра (210), русский, история и информатика.';
+      } else if (lower.includes('обед') || lower.includes('еда') || lower.includes('столов')) {
+        reply = 'В столовой: куриный суп, мясная котлета с пюре и компот.';
+      } else if (lower.includes('дедлайн') || lower.includes('дз') || lower.includes('задан')) {
+        reply = 'Ближайший срок: лабораторная по физике (Шааб Г. А.) до 25 сентября.';
+      } else if (lower.includes('оценк') || lower.includes('балл')) {
+        reply = 'Оценки: Алгебра (4.80), Физика (4.50), Информатика (5.00), Русский (4.25).';
+      }
+
+      chatBox.insertAdjacentHTML('beforeend', `
+        <div class="bubble bot">${reply}<div class="msg-time">${time}</div></div>
+      `);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }, 550);
+  });
+}
+
+function changeDay(btn, dayNum) {
+  document.querySelectorAll('#tab-schedule .day-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  loadScheduleData(dayNum);
+}
+
+function loadScheduleData(dayId) {
+  const container = document.getElementById('scheduleListContainer');
+  if (!container) return;
+  const bells = { 1: "08:00 — 08:40", 2: "08:55 — 09:35", 3: "09:50 — 10:30", 4: "10:40 — 11:20", 5: "11:40 — 12:20" };
+  const mock = {
+    1: [{ num: 1, s: 'Физика', t: 'Шааб Г. А.', r: 'каб. 302' }, { num: 2, s: 'Алгебра', t: 'Савинова А. Г.', r: 'каб. 210' }, { num: 3, s: 'Русский язык', t: 'Еремина О. Н.', r: 'каб. 104' }, { num: 4, s: 'История', t: 'Акимова О. В.', r: 'каб. 205' }, { num: 5, s: 'Информатика', t: 'Савинов А. Г.', r: 'каб. 312' }],
+    2: [{ num: 1, s: 'Алгебра', t: 'Савинова А. Г.', r: 'каб. 210' }, { num: 2, s: 'Физика', t: 'Шааб Г. А.', r: 'каб. 302' }, { num: 3, s: 'Литература', t: 'Еремина О. Н.', r: 'каб. 104' }, { num: 4, s: 'Биология', t: 'Дурсенева М. А.', r: 'каб. 208' }, { num: 5, s: 'Обществознание', t: 'Акимова О. В.', r: 'каб. 205' }]
+  };
+  const list = mock[dayId] || mock[1];
+  container.innerHTML = list.map(d => `
+    <div class="list-item">
+      <div style="display:flex; align-items:center; gap:14px;">
+        <div class="list-item-num">${d.num}</div>
+        <div class="list-item-info"><h4>${d.s}</h4><div class="list-item-sub">${d.t} · ${d.r}</div></div>
+      </div>
+      <div class="time-tag">
+        <svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+        ${bells[d.num]}
+      </div>
+    </div>
+  `).join('');
+}
+
+function getCurrentUser() {
+  const userStr = localStorage.getItem('sferum_user');
+  if (userStr) {
+    try {
+      return JSON.parse(userStr);
+    } catch (e) {}
+  }
+  return null;
+}
+
+function getCurrentUserGrade() {
+  const u = getCurrentUser();
+  if (u && u.grade) {
+    let g = u.grade.replace(/[^0-9а-яА-Яa-zA-Z]/g, '');
+    return g || '11Б';
+  }
+  return '11Б';
+}
+
+function updateTeacherFormVisibility() {
+  const form = document.getElementById('teacherTaskForm');
+  if (!form) return;
+
+  const u = getCurrentUser();
+  if (u && u.role) {
+    const r = String(u.role).toLowerCase();
+    if (r.includes('admin') || r.includes('teacher') || r.includes('учитель') || r.includes('админ')) {
+      form.classList.remove('hidden');
+      return;
+    }
+  }
+
+  form.classList.add('hidden');
+}
+
+async function loadTasksData() {
+  const container = document.getElementById('tasksListContainer');
+  if (!container) return;
+
+  const currentGrade = getCurrentUserGrade();
+  const gradeBadge = document.getElementById('currentGradeBadge');
+  if (gradeBadge) gradeBadge.textContent = `Класс: ${currentGrade}`;
+
+  updateTeacherFormVisibility();
+
+  try {
+    const res = await fetch(`/api/tasks/?grade=${encodeURIComponent(currentGrade)}`);
+    if (res.ok) {
+      const tasks = await res.json();
+      if (Array.isArray(tasks) && tasks.length > 0) {
+        renderTasksList(tasks);
+        return;
+      }
+    }
+  } catch (err) {
+    console.warn('Сервер недоступен, загрузка локального списка');
+  }
+
+  const fallback = [
+    { id: 1, subject: 'Физика', title: 'Лабораторная работа №2', description: 'Отчёт по динамике · Шааб Г. А.', deadline: '25 сентября', target_grade: currentGrade, status: 'pending' },
+    { id: 2, subject: 'Информатика', title: 'Макет WebApp в MAX', description: 'Сдать исходный код и вёрстку', deadline: '26 сентября', target_grade: 'all', status: 'done' }
+  ];
+  renderTasksList(fallback);
+}
+
+function renderTasksList(tasks) {
+  const container = document.getElementById('tasksListContainer');
+  if (!container) return;
+
+  if (tasks.length === 0) {
+    container.innerHTML = `<div style="color:var(--text-muted); font-size:13px; padding:12px;">Нет активных заданий для вашего класса.</div>`;
+    return;
+  }
+
+  container.innerHTML = tasks.map(t => {
+    const isDone = t.status === 'done';
+    const badgeClass = isDone ? 'badge done' : 'badge pending';
+    const badgeText = isDone ? 'Сдано' : 'К сдаче';
+    const gradeLabel = (!t.target_grade || t.target_grade.toLowerCase() === 'all') ? 'ВСЕМ' : t.target_grade;
+
+    return `
+      <div class="list-item" id="task-card-${t.id}">
+        <div class="list-item-info">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-size:11px; color:var(--accent-amber); font-weight:700; font-family:var(--font-ui);">${t.subject.toUpperCase()}</span>
+            <span style="font-size:9.5px; background:rgba(255,255,255,0.06); color:#cbd5e1; padding:2px 6px; border-radius:4px;">${gradeLabel}</span>
+          </div>
+          <h4 style="margin-top:2px;">${t.title}</h4>
+          <div class="list-item-sub">${t.description || ''} · Срок: ${t.deadline || '3 дня'}</div>
+        </div>
+        <span class="${badgeClass}">${badgeText}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+async function handlePublishTaskFromFrontend() {
+  const user = getCurrentUser();
+  const subject = document.getElementById('taskSubject').value.trim();
+  const title = document.getElementById('taskTitle').value.trim();
+  const targetGrade = document.getElementById('taskTargetGrade').value;
+  const deadline = document.getElementById('taskDeadline').value.trim() || '3 дня';
+  const desc = document.getElementById('taskDesc').value.trim();
+  const btn = document.getElementById('publishTaskBtn');
+
+  if (!subject || !title) {
+    alert('Заполните предмет и название задания');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Публикация...';
+  }
+
+  try {
+    const res = await fetch('/api/tasks/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        subject: subject,
+        title: title,
+        description: desc,
+        target_grade: targetGrade,
+        deadline: deadline,
+        user_id: user ? user.id : 1
+      })
+    });
+
+    const textResp = await res.text();
+    let data;
+    try {
+      data = JSON.parse(textResp);
+    } catch (e) {
+      throw new Error("Сервер вернул некорректный ответ: " + textResp);
+    }
+
+    if (!res.ok) throw new Error(data.detail || 'Ошибка публикации');
+
+    alert(`Задание опубликовано для: ${targetGrade === 'all' ? 'Всех классов' : targetGrade}`);
+
+    document.getElementById('taskSubject').value = '';
+    document.getElementById('taskTitle').value = '';
+    document.getElementById('taskDesc').value = '';
+    document.getElementById('taskDeadline').value = '';
+
+    await loadTasksData();
+
+  } catch (err) {
+    alert('Ошибка при публикации на сервере: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Опубликовать для класса';
+    }
+  }
+}
+
+function loadCanteenMenuData() {
+  const container = document.getElementById('canteenMenuContainer');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="meal-card">
+      <div>
+        <span class="badge done">ЗАВТРАК</span>
+        <div class="meal-title">Овсяная каша со сливочным маслом</div>
+        <p class="meal-desc">Сырная нарезка, тост и какао.</p>
+      </div>
+      <button class="btn-max" style="width:100%" onclick="alert('Заказ принят')">Заказать</button>
+    </div>
+    <div class="meal-card">
+      <div>
+        <span class="badge done">ОБЕД</span>
+        <div class="meal-title">Комплекс «Школьный»</div>
+        <p class="meal-desc">Куриный суп с лапшой, мясная котлета с пюре, ягодный компот.</p>
+      </div>
+      <button class="btn-max" style="width:100%" onclick="alert('Заказ принят')">Заказать</button>
+    </div>
+    <div class="meal-card">
+      <div>
+        <span class="badge done">ПОЛДНИК</span>
+        <div class="meal-title">Выпечка с яблоком</div>
+        <p class="meal-desc">Булочка с корицей, биокефир или яблочный сок.</p>
+      </div>
+      <button class="btn-max" style="width:100%" onclick="alert('Заказ принят')">Заказать</button>
+    </div>
+  `;
+}
+
+async function runAiAnalysis() {
+  const text = document.getElementById('aiInputText').value.trim();
+  const btn = document.getElementById('aiBtn');
+  const resultBox = document.getElementById('aiResult');
+  
+  if (text.length < 10) return alert('Введите текст задания (минимум 10 символов)');
+
+  btn.disabled = true;
+  btn.textContent = 'Обработка...';
+
+  try {
+    const res = await fetch('/api/ai/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text })
+    });
+    const data = await res.json();
+
+    resultBox.classList.remove('hidden');
+    document.getElementById('aiResTitle').textContent = `[${data.subject}] ${data.title}`;
+    document.getElementById('aiResEssence').textContent = data.essence;
+    
+    const stepsUl = document.getElementById('aiResSteps');
+    stepsUl.innerHTML = data.steps.map(s => `<li style="margin-bottom:4px;">${s}</li>`).join('');
+
+    document.getElementById('tasksListContainer').insertAdjacentHTML('afterbegin', `
+      <div class="list-item" style="border-left: 3px solid #18b5ea;">
+        <div class="list-item-info">
+          <span style="font-size:11px; color:#18b5ea; font-weight:700;">${data.subject.toUpperCase()}</span>
+          <h4 style="margin-top:2px;">${data.title}</h4>
+          <div class="list-item-sub">Срок: ${data.deadline_suggestion}</div>
+        </div>
+        <span class="badge pending">Новое</span>
+      </div>
+    `);
+  } catch (err) {
+    alert('Сервис анализа временно недоступен');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Разобрать задание';
+  }
+}
+
+async function handleEsiaLogin() {
+  const btn = document.querySelector('.btn-esia');
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Авторизация в ЕСИА...';
+  }
+  
+  try {
+    const res = await fetch('/api/auth/esia/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ snils: "10001234567" })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      localStorage.setItem('sferum_user', JSON.stringify(data.user));
+      applyUserDataToInterface(data.user);
+      renderGrades(data.grades);
+      await loadTasksData();
+    } else {
+      throw new Error(data.detail || 'Ошибка авторизации');
+    }
+  } catch (err) {
+    alert('Не удалось войти: ' + err.message);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg style="width:18px; height:18px; fill:#fff;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"/></svg>
+        Войти через Госуслуги (ЕСИА)
+      `;
+    }
+  }
+}
+
+function applyUserDataToInterface(user) {
+  if (!user) return;
+  document.getElementById('authBox').classList.add('hidden');
+  document.getElementById('userProfileBox').classList.remove('hidden');
+
+  document.getElementById('profileDashboardName').textContent = `${user.last_name || ''} ${user.first_name || ''}`;
+  document.getElementById('fieldEmail').value = user.email || '';
+  
+  const classCard = document.getElementById('profileClassCard');
+  const classInput = document.getElementById('fieldClass');
+  const gradesSection = document.getElementById('gradesSectionContainer');
+  const role = (user.role || 'student').toLowerCase();
+
+  if (role === 'teacher' || role === 'admin') {
+    if (classCard) classCard.style.display = 'none';
+    if (gradesSection) gradesSection.style.display = 'none';
+  } else {
+    if (classCard) classCard.style.display = 'block';
+    if (classInput) classInput.value = user.grade || '11 «Б»';
+    if (gradesSection) gradesSection.style.display = 'block';
+  }
+
+  document.getElementById('fieldSferumId').textContent = user.sferum_id || 'user_id';
+  
+  const roleField = document.getElementById('fieldRole');
+  if (roleField) {
+    roleField.value = role === 'teacher' ? 'Учитель' : (role === 'admin' ? 'Администратор' : 'Ученик');
+  }
+
+  const nickInput = document.getElementById('fieldNicknameInput');
+  if (nickInput) nickInput.value = user.nickname || '';
+
+  const notice = document.getElementById('nicknameNotice');
+  if (notice) {
+    if (user.nickname_can_change) {
+      notice.textContent = 'Никнейм можно изменить прямо сейчас.';
+      notice.style.color = '#10b981';
+    } else if (user.nickname_can_change_at) {
+      const dt = new Date(user.nickname_can_change_at);
+      notice.textContent = `Следующая смена возможна после ${dt.toLocaleDateString()} ${dt.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+      notice.style.color = '#f59e0b';
+    } else {
+      notice.textContent = '';
+    }
+  }
+
+  const roleText = document.getElementById('headerRoleText');
+  if (roleText) {
+    roleText.textContent = role === 'teacher' ? 'Учитель' : (role === 'admin' ? 'Администратор' : (user.grade || '11 класс'));
+  }
+
+  updateNavLockState();
+  updateTeacherFormVisibility();
+}
+
+async function handleSaveNickname() {
+  const nickInput = document.getElementById('fieldNicknameInput');
+  if (!nickInput) return;
+  const newNick = nickInput.value.trim();
+  if (!newNick || newNick.length < 2) {
+    alert('Никнейм должен содержать минимум 2 символа');
+    return;
+  }
+
+  const u = getCurrentUser();
+  if (!u || !u.id) return alert('Пользователь не найден');
+
+  try {
+    const res = await fetch(`/api/auth/me/nickname?user_id=${u.id}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nickname: newNick })
+    });
+    const textResp = await res.text();
+    let data;
+    try {
+      data = JSON.parse(textResp);
+    } catch (e) {
+      throw new Error("Ошибка сервера: " + textResp);
+    }
+
+    if (!res.ok) throw new Error(data.detail || 'Не удалось обновить никнейм');
+
+    localStorage.setItem('sferum_user', JSON.stringify(data.user));
+    applyUserDataToInterface(data.user);
+    alert('Никнейм успешно обновлен!');
+  } catch (err) {
+    alert('Ошибка: ' + err.message);
+  }
+}
+
+function renderGrades(grades) {
+  const container = document.getElementById('gradesContainer');
+  if (!container) return;
+
+  container.innerHTML = grades.map(g => {
+    const val = Number(g.average_score);
+    const gradeVal = Number(g.latest_grade);
+    const gradeColor = (gradeVal >= 5 || val >= 4.5) ? 'var(--accent-emerald)' : ((gradeVal === 4 || val >= 3.5) ? '#60a5fa' : '#f59e0b');
+
+    return `
+      <div class="list-item">
+        <div>
+          <h4>${g.subject}</h4>
+          <div class="list-item-sub">Ср. балл: ${val.toFixed(2)} · ФГИС Моя Школа</div>
+        </div>
+        <strong style="color:${gradeColor}; font-size:17px;">
+          ${gradeVal}
+        </strong>
+      </div>
+    `;
+  }).join('');
+}
+
+async function syncWithMoyaShkola() {
+  const btn = document.getElementById('syncBtn');
+  const gradesContainer = document.getElementById('gradesContainer');
+  const timeLabel = document.getElementById('lastSyncTime');
+
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = 'Запрос...';
+  }
+
+  try {
+    const userStr = localStorage.getItem('sferum_user');
+    const user = userStr ? JSON.parse(userStr) : null;
+    const userId = user && user.id ? user.id : 1;
+
+    const res = await fetch(`/api/auth/sync-grades/${userId}`);
+    const data = await res.json();
+
+    if (!res.ok) throw new Error(data.detail || 'Ошибка шлюза');
+
+    if (data.grades && data.grades.length > 0) {
+      renderGrades(data.grades);
+    }
+
+    const now = new Date();
+    const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    if (timeLabel) timeLabel.textContent = `Обновлено в ${timeStr}`;
+
+  } catch (err) {
+    if (timeLabel) timeLabel.textContent = 'Ошибка обновления';
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = 'Синхронизировать с «Моя Школа»';
+    }
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem('sferum_user');
+  document.getElementById('userProfileBox').classList.add('hidden');
+  document.getElementById('authBox').classList.remove('hidden');
+  const roleText = document.getElementById('headerRoleText');
+  if (roleText) roleText.textContent = 'Гость (войдите в аккаунт)';
+  
+  updateNavLockState();
+  updateTeacherFormVisibility();
+  loadTasksData();
+  approachPlanetTransition('home');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const savedUser = localStorage.getItem('sferum_user');
+  if (savedUser) {
+    try {
+      applyUserDataToInterface(JSON.parse(savedUser));
+    } catch (e) {}
+  } else {
+    updateNavLockState();
+  }
+  loadScheduleData(1);
+  loadTasksData();
+  loadCanteenMenuData();
+  nextSituation();
+  setupAlwaysActiveScrollAnimations();
+});
+</script>
+</body>
+</html>
